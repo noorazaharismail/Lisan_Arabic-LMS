@@ -1,0 +1,9 @@
+{
+  "name": "Lisān — Classical Arabic Studio",
+  "short_name": "Lisān",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#fbfaf7",
+  "theme_color": "#0b5c43",
+  "description": "A visual, teacher-first Classical Arabic and Tajwīd learning studio."
+}

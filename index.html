@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b5c43" />
+  <meta name="description" content="Lisān: a visual classical Arabic and Tajwīd learning studio." />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+  <title>Lisān — Classical Arabic Studio</title>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="app-shell">
+    <aside class="side-nav" aria-label="Primary navigation">
+      <button class="brand" data-route="home" aria-label="Lisān home"><span class="brand-mark">ل</span><span>Lisān<small>لِسَان</small></span></button>
+      <nav class="nav-list">
+        <button class="nav-link active" data-route="home"><span>⌂</span> Today</button>
+        <button class="nav-link" data-route="path"><span>◒</span> Learning path</button>
+        <button class="nav-link" data-route="tajweed"><span>✦</span> Tajwīd lab</button>
+        <button class="nav-link" data-route="studio"><span>◉</span> Speaking studio</button>
+        <button class="nav-link" data-route="dictionary"><span>⌕</span> Dictionary</button>
+      </nav>
+      <div class="side-foot"><span class="online-dot"></span><b>Private by default</b><br />Progress and recordings remain on this device unless you later connect cloud sync.</div>
+    </aside>
+
+    <main id="main">
+      <header class="topbar">
+        <div><p class="eyebrow" id="route-label">TODAY’S PATH</p><p class="top-lesson" id="top-lesson">Foundation · Sound & script</p></div>
+        <div class="top-actions"><button class="streak" type="button">✦ <b id="streak-count">1</b> day</button><button class="profile" type="button" data-route="home"><span>OA</span><b>Ozzie</b></button></div>
+      </header>
+
+      <section id="home" class="view active" aria-labelledby="home-title">
+        <div class="hero-card">
+          <div class="hero-copy">
+            <p class="welcome"><span>☀</span> A calm start, Ozzie</p>
+            <p class="eyebrow">CLASSICAL ARABIC · 15 MINUTES</p>
+            <h1 id="home-title">Learn Arabic<br /><em>from the inside out.</em></h1>
+            <p class="lead">See the pattern, hear a model, say it aloud, then meet it again in Qur’an and classical texts.</p>
+            <div class="hero-actions"><button class="btn primary" data-start-next>Continue lesson <b>→</b></button><button class="btn ghost" data-route="path">View your path</button></div>
+            <p class="muted small">Your goal is proficiency, not speed. Teacher feedback remains essential for Qur’anic recitation.</p>
+          </div>
+          <div class="hero-visual" aria-hidden="true">
+            <div class="orbit o1"></div><div class="orbit o2"></div>
+            <div class="letter-sun">ب<small>bāʾ</small></div>
+            <div class="float-card f1"><span>◌</span> Listen</div><div class="float-card f2"><span>◉</span> Record</div><div class="float-card f3"><span>✦</span> Understand</div>
+          </div>
+        </div>
+        <div class="daily-goal card">
+          <div class="goal-ring"><b id="daily-percent">0%</b><small>today</small></div>
+          <div><p class="eyebrow">DAILY RHYTHM</p><h2 id="daily-title">One lesson · one recording · three words</h2><p id="daily-next">Begin with the sound map: how the Arabic mouth makes meaning.</p></div>
+          <button class="btn outline" data-start-next>Open lesson →</button>
+        </div>
+        <div class="metric-row" aria-label="Learning statistics">
+          <article><b id="metric-streak">1</b><span>day streak</span></article><article><b id="metric-minutes">0</b><span>minutes practised</span></article><article><b id="metric-words">0</b><span>words saved</span></article><article><b id="metric-complete">0/87</b><span>lessons mastered</span></article>
+        </div>
+        <div class="section-heading"><div><p class="eyebrow">LEARN WITH INTENTION</p><h2>One path, four connected skills.</h2></div><button class="text-btn" data-route="path">All stages →</button></div>
+        <div class="skill-grid">
+          <article class="skill-card green"><span class="skill-icon">ا</span><p class="eyebrow">READ</p><h3>Pattern-first Arabic</h3><p>Roots, morphology, grammar and guided classical reading.</p></article>
+          <article class="skill-card peach"><span class="skill-icon">◌</span><p class="eyebrow">HEAR</p><h3>Sound before spelling</h3><p>Listen to the model, isolate the sound and repeat deliberately.</p></article>
+          <article class="skill-card lilac"><span class="skill-icon">◉</span><p class="eyebrow">SPEAK</p><h3>Record and notice</h3><p>Play back your own voice; keep a private practice archive.</p></article>
+          <article class="skill-card gold"><span class="skill-icon">۝</span><p class="eyebrow">RECITE</p><h3>Tajwīd in context</h3><p>See the rule, hear a reference recitation, then consult a teacher.</p></article>
+        </div>
+        <aside class="teacher-note"><b>Adab of study.</b> Lisān follows an Ahl al-Sunnah wa-l-Jamāʿah orientation and labels its recitation track as <b>Ḥafṣ ʿan ʿĀṣim</b>. It teaches language and practice—not fatwā. Worship or doctrine questions should go to a qualified Shāfiʿī scholar.</aside>
+      </section>
+
+      <section id="path" class="view" aria-labelledby="path-title">
+        <div class="page-title"><p class="eyebrow">CLASSICAL ARABIC PATH</p><h1 id="path-title">From first sound to<br /><em>independent reading.</em></h1><p>87 lessons across nine stages. Every stage returns to comprehension, listening, reading and speech—not grammar in isolation.</p></div>
+        <div class="path-summary card"><div><span class="eyebrow">YOUR COURSE MAP</span><h2 id="path-summary-title">Stage 1 · Sound & script</h2><p id="path-summary-copy">Build a reliable reading voice before you chase vocabulary.</p></div><div class="mastery-key"><span><i class="dot unlocked"></i> ready</span><span><i class="dot complete"></i> mastered</span><span><i class="dot locked"></i> later</span></div></div>
+        <div id="stage-list" class="stage-list"></div>
+      </section>
+
+      <section id="lesson" class="view lesson-view" aria-labelledby="lesson-title">
+        <button class="back-btn" data-route="path">← Back to learning path</button>
+        <div class="lesson-head"><div><p class="eyebrow" id="lesson-kicker">FOUNDATION · LESSON 01</p><h1 id="lesson-title">The sound map</h1><p id="lesson-subtitle">Arabic is heard through its places of articulation before it is translated into English letters.</p></div><div class="lesson-progress"><span id="lesson-step-label">1 of 4</span><div><i id="lesson-progress-fill"></i></div></div></div>
+        <div id="lesson-stage" class="lesson-stage"></div>
+        <div class="lesson-controls"><button class="btn ghost" id="prev-step">← Back</button><button class="btn primary" id="next-step">Continue <b>→</b></button></div>
+      </section>
+
+      <section id="tajweed" class="view" aria-labelledby="tajweed-title">
+        <div class="page-title"><p class="eyebrow">RECITATION SCIENCE · ḤAFṢ ʿAN ʿĀṢIM</p><h1 id="tajweed-title">Tajwīd you can<br /><em>see, hear and trace.</em></h1><p>The lab makes rules visual. It does not certify a recitation; take your recording to a qualified, authorised teacher for correction.</p></div>
+        <div class="tajweed-tabs" role="tablist"><button class="active" data-taj-tab="foundation" role="tab">Foundation</button><button data-taj-tab="applied" role="tab">Applied rules</button><button data-taj-tab="advanced" role="tab">Advanced study</button></div>
+        <div id="tajweed-grid" class="tajweed-grid"></div>
+        <article id="tajweed-detail" class="tajweed-detail card" aria-live="polite"><div class="tajweed-detail-top"><span class="rule-badge">VISUAL RULE CARD</span><button class="icon-btn" id="tajweed-close" aria-label="Close rule card">×</button></div><div id="tajweed-detail-body"><h2>Select a rule card</h2><p>Each card opens a colour-coded cue, an example, a practice prompt and a teacher check.</p></div></article>
+      </section>
+
+      <section id="studio" class="view" aria-labelledby="studio-title">
+        <div class="page-title"><p class="eyebrow">SPEAKING & RECITATION STUDIO</p><h1 id="studio-title">Listen. Repeat.<br /><em>Hear yourself clearly.</em></h1><p>Use model audio as a reference and your own recordings for reflection. The app does not claim to grade tajwīd automatically.</p></div>
+        <div class="studio-grid">
+          <article class="reference-card card"><p class="eyebrow">MODEL PASSAGE · AL-FĀTIḤAH 1:1</p><p class="quran-line">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</p><p class="translit">bismi llāhi r-raḥmāni r-raḥīm</p><p class="translation">In the name of Allah—the Most Compassionate, Most Merciful.</p><div class="word-pills"><button data-word="بِسْمِ">بِسْمِ</button><button data-word="اللَّهِ">اللَّهِ</button><button data-word="الرَّحْمَٰنِ">الرَّحْمَٰنِ</button><button data-word="الرَّحِيمِ">الرَّحِيمِ</button></div><div class="audio-row"><button class="btn outline" id="play-reference">▷ Play reciter reference</button><button class="btn ghost" id="speak-reference">◌ Hear slow guide</button></div><p class="tiny">The reference button loads a streamed, licensed host when available; slow guide uses your device’s Arabic voice as a fallback—not as a tajwīd authority.</p></article>
+          <article class="record-card card"><p class="eyebrow">YOUR PRIVATE TAKE</p><div class="record-orb" id="record-orb"><span>◉</span></div><h2 id="record-status">Ready to record</h2><p id="record-help">Allow your microphone, read the prompt calmly, then use playback to notice length, clarity and pauses.</p><div class="record-actions"><button class="btn record" id="record-button"><i></i><span>Start recording</span></button><button class="btn outline" id="play-take" disabled>▷ Playback</button></div><div class="take-list" id="take-list"><p class="empty-takes">Your saved practice takes will appear here.</p></div></article>
+        </div>
+        <article class="word-lens card" id="word-lens"><p class="eyebrow">WORD LENS</p><h2>Tap a word above</h2><p>Lisān will show a short gloss, root and grammar cue to connect sound to meaning.</p></article>
+      </section>
+
+      <section id="dictionary" class="view" aria-labelledby="dictionary-title">
+        <div class="page-title"><p class="eyebrow">PERSONAL LEXICON</p><h1 id="dictionary-title">Find it. See it.<br /><em>Keep it.</em></h1><p>A growing English → Arabic study dictionary. Search in either language, hear a slow guide, and save words for review.</p></div>
+        <form class="dict-search" id="dict-form"><input id="dict-input" autocomplete="off" placeholder="Try: mercy, book, learn, prayer…" aria-label="Search English or Arabic dictionary" /><button class="btn primary">Search <b>→</b></button></form>
+        <div id="dict-result" class="dict-result card"><div class="empty-lexicon">ع</div><h2>Start with one useful word</h2><p>This offline starter lexicon contains high-frequency Qur’anic and classical-study vocabulary. You can add your own cards below.</p></div>
+        <div class="dict-lower"><article class="saved-lexicon"><div class="section-heading"><div><p class="eyebrow">REVIEW STACK</p><h2>Words you saved</h2></div><span id="saved-count">0 words</span></div><div id="saved-words" class="saved-words"></div></article><article class="add-word card"><p class="eyebrow">ADD A PERSONAL WORD</p><h2>Make the dictionary yours</h2><form id="custom-word-form"><label>English<input name="english" required placeholder="e.g. patience" /></label><label>Arabic<input class="arabic-input" dir="rtl" name="arabic" required placeholder="صَبْر" /></label><label>Note<input name="note" placeholder="Optional context" /></label><button class="btn outline">Add word</button></form></article></div>
+      </section>
+
+      <section id="sources" class="view" aria-labelledby="sources-title">
+        <div class="page-title"><p class="eyebrow">METHOD & SOURCES</p><h1 id="sources-title">Built with<br /><em>clear boundaries.</em></h1><p>This app is a study companion. Its curriculum uses traditional grammar sequencing, proficiency-based practice and a teacher-first tajwīd policy.</p></div>
+        <div id="source-list" class="source-list"></div>
+      </section>
+    </main>
+  </div>
+  <nav class="mobile-nav" aria-label="Mobile navigation"><button data-route="home">⌂<small>Today</small></button><button data-route="path">◒<small>Learn</small></button><button data-route="tajweed">✦<small>Tajwīd</small></button><button data-route="studio">◉<small>Speak</small></button><button data-route="dictionary">⌕<small>Words</small></button></nav>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="./data.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
