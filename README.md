@@ -4,12 +4,15 @@ A visual, mobile-first Classical Arabic and Tajwīd learning studio. It is delib
 
 ## What is included
 
-- **87 sequenced lessons in 9 stages**: sound/script, vocabulary, naḥw, ṣarf, classical reading, Qur’anic Arabic, Tajwīd foundation, Tajwīd mastery, and an advanced reading pathway.
+- **87 fully guided, sequenced lessons in 9 stages**: every lesson now has a target, teacher lens, observation prompt, deliberate drill, visual board, production task, retrieval check and a Qur’anic listening card.
 - **Visual learning system**: pattern cards, articulation prompts, colour-coded Tajwīd diagrams, progression map and responsive mobile UI.
 - **Audio**:
-  - slow Arabic device-speech guide for letters/words;
-  - a streamed reciter-reference attempt for Al-Fātiḥah 1:1 with clear fallback messaging;
+  - authentic streamed Qur’anic references from **Mishary Rashid Alafasy** (murattal) or **Abdul Basit Abdus-Samad** (mujawwad), selectable in the Speaking Studio;
+  - a mapped Qur’anic listening card in all 87 lessons and every Tajwīd rule card;
+  - **no synthetic-speech fallback** for Qur’an or Tajwīd practice;
   - private microphone recording, playback and IndexedDB storage of practice takes.
+
+For ordinary non-Qur’anic vocabulary, the app intentionally does not mislabel a qārī recording as a general spoken-Arabic model. A future release should add human-recorded Arabic teacher clips for those items.
 - **Progress tracking**: local lesson completion, minutes, streak, saved vocabulary and daily rhythm.
 - **Dictionary**: searchable English → Arabic starter lexicon, Arabic search, saved review stack, and personal entries.
 - **Tajwīd**: foundational, applied and advanced Hafṣ ʿan ʿĀṣim study prompts, with clear teacher-review boundaries.
@@ -45,7 +48,8 @@ A production cloud-sync release should add:
 
 - The app displays only short teaching excerpts.
 - Do not bundle recitations unless their licence explicitly permits redistribution.
-- For production Qur’anic text, translation, morphology and recitation metadata, use the Quran Foundation API through a server-side integration with the required credentials. The app’s current reference stream is a graceful enhancement, not a claim of an embedded licenced audio library.
+- The app streams documented Quran Foundation verse-reference URLs; it does not package recitation files locally.
+- For a fuller production Qur’anic text, translation, morphology and recitation integration, use the Quran Foundation API through a server-side integration with the required credentials.
 
 ## Quality boundaries
 

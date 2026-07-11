@@ -14,7 +14,29 @@
   const allLessons = DATA.stages.flatMap((s,stageIndex)=>s.lessons.map((l,lessonIndex)=>({...l,stageIndex,lessonIndex,stage:s}))); 
   let currentLesson = null, lessonStep = 0, selectedSound = '';
   let currentTakeURL = null, recorder = null, recorderStream = null, chunks = [];
-  const RECITER_URL = 'https://verses.quran.foundation/AbdulBaset/Mujawwad/mp3/001001.mp3';
+  let selectedReciter = localStorage.getItem('lisan-reciter') || 'alafasy';
+  if(!DATA.reciters[selectedReciter]) selectedReciter='alafasy';
+  const getReciter = () => DATA.reciters[selectedReciter];
+  const qariAudioUrl = card => `${getReciter().base}${card.code}.mp3`;
+  function playQari(card){
+    if(!card){ toast('This listening card is not available yet.'); return; }
+    const audio=new Audio(qariAudioUrl(card));
+    audio.addEventListener('error',()=>toast(`${getReciter().name}'s reference stream is unavailable. No synthetic fallback is used for recitation.`),{once:true});
+    audio.play().catch(()=>toast('The qārī reference needs a network connection and a browser play gesture.'));
+  }
+  function lessonQariCard(lesson,buttonId='lesson-qari'){
+    const card=lesson.card, reciter=getReciter();
+    return `<aside class="qari-card"><div><p class="eyebrow">AUTHENTIC QUR’ANIC LISTENING CARD</p><h3>${esc(card.label)}</h3><p class="qari-card-ar" dir="rtl">${esc(card.arabic)}</p><p>${esc(card.purpose)}. This is a qārī reference for recitation—not a device-generated pronunciation.</p></div><button class="btn outline" id="${buttonId}">▷ Play ${esc(reciter.name)}</button></aside>`;
+  }
+  function ruleQariCard(rule){
+    const cards={makharij:0,short:0,madd:0,ghunnah:0,nun:1,meem:1,qalqalah:5,heavy:6,ra:0,'madd-far':5,waqf:5,review:5};
+    return DATA.quranListeningCards[cards[rule.id] ?? 0];
+  }
+  function updateQariControls(){
+    const r=getReciter();
+    $('#play-reference')?.replaceChildren(document.createTextNode(`▷ Play ${r.name}`));
+    $('#reciter-select') && ($('#reciter-select').value=selectedReciter);
+  }
 
   function studyToday(){
     if(state.lastStudy !== today()){
@@ -74,20 +96,15 @@
     currentLesson=allLessons.find(l=>l.id===id); if(!currentLesson) return;
     lessonStep=0; selectedSound=''; renderLesson(); route('lesson');
   }
-  function speakArabic(text){
-    if(!('speechSynthesis' in window)){ toast('Speech playback is not available in this browser.'); return; }
-    const say=()=>{ window.speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text); const v=speechSynthesis.getVoices().find(x=>x.lang.toLowerCase().startsWith('ar')); if(v)u.voice=v; u.lang='ar-SA';u.rate=.66;u.pitch=1;window.speechSynthesis.speak(u); };
-    if(speechSynthesis.getVoices().length) say(); else speechSynthesis.onvoiceschanged=say;
-  }
   function lessonSoundTiles(){
-    const letters=currentLesson.id==='L01' ? [['بَ','bāʾ + fatḥah'],['تَ','tāʾ + fatḥah'],['ثَ','thāʾ + fatḥah']] : [[currentLesson.ar,currentLesson.title],['كَتَبَ','kataba'],['قَالَ','qāla']];
-    return `<div class="sound-tiles">${letters.map(([a,n])=>`<button class="sound-tile" data-sound="${a}">${a}<small>${n}</small></button>`).join('')}</div><button class="btn outline listen-btn" id="lesson-listen" ${selectedSound?'':'disabled'}>◌ Hear selected sound</button>`;
+    const tokens=(currentLesson.ar.match(/[^\s/]+/g)||[currentLesson.ar]).slice(0,4);
+    return `<div class="sound-tiles static-tiles">${tokens.map((token,i)=>`<span class="sound-tile static">${esc(token)}<small>${i===0?'target':'read in sequence'}</small></span>`).join('')}</div>${lessonQariCard(currentLesson)}`;
   }
   function lessonChoices(){
-    const opts=[currentLesson.ar,'كِتَابٌ','رَحْمَةٌ','قَالَ'].filter((v,i,a)=>a.indexOf(v)===i).slice(0,4);
-    while(opts.length<4) opts.push(['هٰذَا','صَبْرٌ','عِلْمٌ','مَاءٌ'][opts.length]);
+    const opts=[currentLesson.ar,'كِتَابٌ','رَحْمَةٌ','قَالَ','عِلْمٌ'].filter((v,i,a)=>a.indexOf(v)===i).slice(0,4);
+    while(opts.length<4) opts.push(['هٰذَا','صَبْرٌ','مَاءٌ'][opts.length]||'هُدًى');
     opts.sort(()=>Math.random()-.5);
-    return `<div class="challenge"><p class="eyebrow">QUICK CHECK</p><h3>Which visual pattern is today’s focus?</h3><div class="choice-grid">${opts.map(o=>`<button class="choice" data-answer="${o}">${o}</button>`).join('')}</div><p class="small muted" id="challenge-feedback">Choose once, then explain the difference aloud.</p></div>`;
+    return `<div class="challenge"><p class="eyebrow">GUIDED CHECK</p><h3>${esc(currentLesson.content.check)}</h3><div class="choice-grid">${opts.map(o=>`<button class="choice" data-answer="${esc(o)}">${esc(o)}</button>`).join('')}</div><p class="small muted" id="challenge-feedback">Select the target, then explain the visible cue in your own words.</p></div>`;
   }
   function lessonVisual(l){
     const target=esc(l.ar);
@@ -107,17 +124,16 @@
     $('#lesson-title').textContent=l.title; $('#lesson-subtitle').textContent=l.objective;
     $('#lesson-step-label').textContent=`${lessonStep+1} of 4`; $('#lesson-progress-fill').style.width=`${(lessonStep+1)*25}%`;
     const panes=[
-      `<div class="lesson-stage-inner"><p class="eyebrow">NOTICE THE PATTERN</p><div class="mega-arabic">${l.ar}</div><h2>${l.title}</h2><p>${l.objective}</p><div class="challenge"><p class="eyebrow">TEACHER’S LENS</p><h3>${l.focus}</h3><p>Say the Arabic focus once slowly. Ask: “What do I see? What do I hear? What changes the meaning?”</p></div></div>`,
-      `<div class="lesson-stage-inner"><p class="eyebrow">LISTEN & REPEAT</p><h2>Hear before you translate</h2><p>Choose a sound or form. Speak it after the audio ends, leaving space for your own voice.</p>${lessonSoundTiles()}<p class="small muted">On-device Arabic speech is a slow guide. For Qur’anic recitation, use the reciter reference and a qualified teacher.</p></div>`,
-      `<div class="lesson-stage-inner"><p class="eyebrow">MAKE IT VISUAL</p>${lessonVisual(l)}<div class="challenge"><p class="eyebrow">PATTERN CARD</p><h3>${l.title}</h3><p>${l.focus}</p><button class="btn outline" id="pattern-audio">◌ Hear the pattern</button></div></div>`,
-      `<div class="lesson-stage-inner"><p class="eyebrow">RETRIEVE & REFLECT</p><h2>Can you recognise it without help?</h2><p>Use this one check as a prompt, then say the rule or meaning in your own words.</p>${lessonChoices()}<div class="challenge"><p class="eyebrow">SPEAK</p><h3>Record a ten-second reflection</h3><p>Say the Arabic focus, then describe what you noticed. Your longer recordings are saved in the Speaking Studio.</p><button class="btn outline" data-route="studio">Open Speaking Studio →</button></div></div>`
+      `<div class="lesson-stage-inner"><p class="eyebrow">${esc(l.content.sequence)} · NOTICE</p><div class="mega-arabic">${esc(l.ar)}</div><h2>${esc(l.title)}</h2><p>${esc(l.objective)}</p><div class="challenge"><p class="eyebrow">TEACHER’S LENS</p><h3>${esc(l.focus)}</h3><p>${esc(l.content.observe)}</p></div></div>`,
+      `<div class="lesson-stage-inner"><p class="eyebrow">LISTEN WITH A QĀRĪ</p><h2>Hear authentic recitation—then practise deliberately.</h2><p>${esc(l.content.drill)}</p>${lessonSoundTiles()}<p class="small muted">A qārī is an authoritative recitation model for Qur’anic listening. This app does not use synthetic speech as a tajwīd or Qur’an model.</p></div>`,
+      `<div class="lesson-stage-inner"><p class="eyebrow">MAKE IT VISUAL</p>${lessonVisual(l)}<div class="challenge"><p class="eyebrow">PATTERN CARD</p><h3>${esc(l.title)}</h3><p>${esc(l.focus)}</p><p class="small muted">${esc(l.content.produce)}</p><button class="btn outline" id="pattern-qari">▷ Hear the selected qārī reference</button></div></div>`,
+      `<div class="lesson-stage-inner"><p class="eyebrow">RETRIEVE & REFLECT</p><h2>Can you recognise the form and explain it?</h2><p>${esc(l.content.produce)}</p>${lessonChoices()}<div class="challenge"><p class="eyebrow">SPEAK</p><h3>Record a ten-second reflection</h3><p>Read the target, name one visual cue, then note what you will ask a teacher to correct.</p><button class="btn outline" data-route="studio">Open Speaking Studio →</button></div></div>`
     ];
     $('#lesson-stage').innerHTML=panes[lessonStep];
     $('#prev-step').disabled=lessonStep===0; $('#prev-step').style.opacity=lessonStep===0?'.45':'1';
     const final=lessonStep===3; $('#next-step').innerHTML=final?(state.completed.includes(l.id)?'Back to path <b>→</b>':'Master this lesson <b>✓</b>'):'Continue <b>→</b>';
-    $$('.sound-tile').forEach(t=>t.addEventListener('click',()=>{selectedSound=t.dataset.sound;$$('.sound-tile').forEach(x=>x.classList.toggle('active',x===t));const b=$('#lesson-listen'); if(b)b.disabled=false;}));
-    $('#lesson-listen')?.addEventListener('click',()=>speakArabic(selectedSound));
-    $('#pattern-audio')?.addEventListener('click',()=>speakArabic(l.ar));
+    $('#lesson-qari')?.addEventListener('click',()=>playQari(l.card));
+    $('#pattern-qari')?.addEventListener('click',()=>playQari(l.card));
     $$('.choice').forEach(b=>b.addEventListener('click',()=>{const ok=stripArabic(b.dataset.answer)===stripArabic(l.ar);$$('.choice').forEach(x=>x.disabled=true);b.classList.add(ok?'correct':'wrong'); const correct=$$('.choice').find(x=>stripArabic(x.dataset.answer)===stripArabic(l.ar)); if(correct)correct.classList.add('correct');$('#challenge-feedback').textContent=ok?'Correct. Now say why this is the focus.':'Notice the highlighted answer, then read it aloud once.';}));
     $$('[data-route="studio"]', $('#lesson-stage')).forEach(b=>b.addEventListener('click',()=>route('studio')));
   }
@@ -132,8 +148,9 @@
   }
   function openRule(r){
     const dots=Array.from({length:r.id==='madd'||r.id==='madd-far'?4:2},(_,i)=>`<i class="${i<2?'active':''}"></i>`).join('');
-    $('#tajweed-detail-body').innerHTML=`<div class="rule-detail-content"><div class="rule-diagram"><p class="eyebrow">VISUAL CUE</p><div class="diagram-word">${r.example.replace(r.highlight,`<span class="highlight">${r.highlight}</span>`)}</div><div class="counting">${dots}</div></div><div><p class="eyebrow">${r.arabic}</p><h2>${r.title}</h2><p>${r.summary}</p><p><b>Practice cue:</b> ${r.cue}</p><button class="btn outline" id="rule-speak">◌ Hear slow guide</button><div class="teacher-check"><b>Teacher check.</b> ${r.teacher}</div></div></div>`;
-    $('#tajweed-detail').classList.add('show'); $('#rule-speak').onclick=()=>speakArabic(r.example);
+    const card=ruleQariCard(r);
+    $('#tajweed-detail-body').innerHTML=`<div class="rule-detail-content"><div class="rule-diagram"><p class="eyebrow">VISUAL CUE</p><div class="diagram-word">${r.example.replace(r.highlight,`<span class="highlight">${r.highlight}</span>`)}</div><div class="counting">${dots}</div></div><div><p class="eyebrow">${r.arabic}</p><h2>${r.title}</h2><p>${r.summary}</p><p><b>Practice cue:</b> ${r.cue}</p><button class="btn outline" id="rule-qari">▷ Play ${esc(getReciter().name)} · ${esc(card.label)}</button><p class="tiny">This is a Qur’anic listening reference; verify the rule in its marked text with a qualified teacher.</p><div class="teacher-check"><b>Teacher check.</b> ${r.teacher}</div></div></div>`;
+    $('#tajweed-detail').classList.add('show'); $('#rule-qari').onclick=()=>playQari(card);
     $('#tajweed-detail').scrollIntoView({behavior:'smooth',block:'nearest'});
   }
   $$('.tajweed-tabs button').forEach(b=>b.addEventListener('click',()=>renderTajweed(b.dataset.tajTab)));
@@ -149,8 +166,8 @@
     if(!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder){toast('Recording needs a browser that supports microphone capture.');return;}
     try{recorderStream=await navigator.mediaDevices.getUserMedia({audio:true});chunks=[];recorder=new MediaRecorder(recorderStream);recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data);};recorder.onstop=async()=>{const blob=new Blob(chunks,{type:recorder.mimeType||'audio/webm'});if(currentTakeURL)URL.revokeObjectURL(currentTakeURL);currentTakeURL=URL.createObjectURL(blob);$('#play-take').disabled=false;$('#record-status').textContent='Your take is ready';$('#record-help').textContent='Use playback for self-review, then save another take after a teacher’s correction.';$('#record-button').innerHTML='<i></i><span>Start recording</span>';$('#record-orb').classList.remove('recording');recorderStream.getTracks().forEach(t=>t.stop());const saved=await saveTake(blob);if(saved){studyToday();state.recordedToday=true;state.minutes+=3;save();renderTakes();toast('Practice take saved privately on this device.');}};recorder.start();$('#record-button').innerHTML='<i></i><span>Stop & save</span>';$('#record-status').textContent='Recording…';$('#record-help').textContent='Recite steadily. Leave a small breath at the end before you stop.';$('#record-orb').classList.add('recording');}catch{toast('Microphone permission is needed to record a take.');}}
   $('#record-button').addEventListener('click',startRecording);$('#play-take').addEventListener('click',()=>{if(!currentTakeURL)return;const a=new Audio(currentTakeURL);a.play().catch(()=>toast('Playback needs a browser gesture.'));});
-  $('#speak-reference').addEventListener('click',()=>speakArabic('بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ'));
-  $('#play-reference').addEventListener('click',()=>{const a=new Audio(RECITER_URL);a.addEventListener('error',()=>{toast('Reference stream unavailable. Playing a slow device guide instead.');speakArabic('بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ');},{once:true});a.play().catch(()=>{toast('Reference stream needs a second tap or a network connection.');});});
+  $('#reciter-select')?.addEventListener('change',e=>{selectedReciter=e.target.value;localStorage.setItem('lisan-reciter',selectedReciter);updateQariControls();toast(`${getReciter().name} selected for Qur’anic reference audio.`);});
+  $('#play-reference').addEventListener('click',()=>playQari(DATA.quranListeningCards[0]));
   const wordLens={
     'بِسْمِ':['In the name','س م و','Preposition + a genitive noun'], 'اللَّهِ':['of Allah','أ ل ه','Proper noun in genitive after bi-'], 'الرَّحْمَٰنِ':['The Most Compassionate','ر ح م','Definite adjective, genitive'], 'الرَّحِيمِ':['The Most Merciful','ر ح م','Definite adjective, genitive']
   };
@@ -161,8 +178,8 @@
   function displayWord(w){
     if(!w){$('#dict-result').innerHTML='<div class="empty-lexicon">؟</div><h2>Not in the starter lexicon yet</h2><p>Add it as a personal word below, or try a base English form (for example “forgive” rather than “forgiveness”).</p>';return;}
     const saved=state.saved.some(s=>s.arabic===w.arabic);
-    $('#dict-result').innerHTML=`<div class="dict-card"><div><p class="eyebrow">${esc(w.root==='—'?'FUNCTION WORD':`ROOT · ${w.root}`)}</p><h2>${esc(w.english)}</h2><p class="trans">${esc(w.transliteration)}</p><p class="note">${esc(w.note)}</p><div class="dict-actions"><button class="btn outline" id="dict-speak">◌ Hear slow guide</button><button class="btn ${saved?'ghost':'primary'}" id="dict-save">${saved?'Saved ✓':'Save for review'}</button></div></div><div class="arabic-word" dir="rtl">${esc(w.arabic)}</div></div>`;
-    $('#dict-speak').onclick=()=>speakArabic(w.arabic); $('#dict-save').onclick=()=>toggleSaved(w);
+    $('#dict-result').innerHTML=`<div class="dict-card"><div><p class="eyebrow">${esc(w.root==='—'?'FUNCTION WORD':`ROOT · ${w.root}`)}</p><h2>${esc(w.english)}</h2><p class="trans">${esc(w.transliteration)}</p><p class="note">${esc(w.note)}</p><p class="tiny">Pronunciation is practised through teacher feedback and Qur’anic qārī references; this dictionary does not present synthetic speech as a recitation model.</p><div class="dict-actions"><button class="btn ${saved?'ghost':'primary'}" id="dict-save">${saved?'Saved ✓':'Save for review'}</button></div></div><div class="arabic-word" dir="rtl">${esc(w.arabic)}</div></div>`;
+    $('#dict-save').onclick=()=>toggleSaved(w);
   }
   function toggleSaved(w){ const ix=state.saved.findIndex(x=>x.arabic===w.arabic); if(ix>=0){state.saved.splice(ix,1);toast('Removed from your review stack.');}else{studyToday();state.saved.push({...w,savedOn:today()});toast(`${w.english} saved for review.`);}save();displayWord(w); }
   function renderSaved(){ const t=$('#saved-words'); if(!t)return;$('#saved-count').textContent=`${state.saved.length} ${state.saved.length===1?'word':'words'}`;t.innerHTML=state.saved.length?state.saved.map((w,i)=>`<article class="saved-word"><div><span class="s-en">${esc(w.english)}</span><small>${esc(w.transliteration)}</small></div><span class="s-ar">${esc(w.arabic)}</span><button data-remove-saved="${i}" aria-label="Remove ${esc(w.english)}">×</button></article>`).join(''):'<p class="muted small">Save useful words to turn this into your own review stack.</p>';$$('[data-remove-saved]').forEach(b=>b.addEventListener('click',()=>{state.saved.splice(Number(b.dataset.removeSaved),1);save();toast('Removed from review.');})); }
@@ -174,6 +191,6 @@
   $('.teacher-note').insertAdjacentHTML('beforeend',' <button class="text-btn" data-route="sources">Method & sources →</button>');
   $('.teacher-note [data-route="sources"]').addEventListener('click',()=>route('sources'));
 
-  renderStages(); renderStats(); renderTajweed(); renderSources(); renderTakes();
+  renderStages(); renderStats(); renderTajweed(); renderSources(); renderTakes(); updateQariControls();
   if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
 })();
